@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PORT=3000
+      - ADMIN_PASSWORD=oficina2024
+    restart: unless-stopped

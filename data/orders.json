@@ -1,0 +1,132 @@
+{
+  "updatedAt": "2026-11-06T10:00:00.000Z",
+  "workshop": {
+    "name": "Oficina Central",
+    "totalSlots": 8
+  },
+  "orders": [
+    {
+      "id": "OS001",
+      "slot": 1,
+      "plate": "ABC-1234",
+      "model": "Honda Civic 2019",
+      "owner": "João Silva",
+      "status": "em_andamento",
+      "service": "Troca de freios",
+      "type": "troca",
+      "value": 580.00,
+      "parts": [
+        { "name": "Pastilha de freio diant.", "qty": 1, "stock": 3, "type": "troca" },
+        { "name": "Disco de freio diant.", "qty": 2, "stock": 1, "type": "troca" }
+      ],
+      "progress": 65,
+      "arrival": "2026-11-06T08:30:00.000Z",
+      "estimatedEnd": "2026-11-06T14:00:00.000Z",
+      "mechanic": "Carlos"
+    },
+    {
+      "id": "OS002",
+      "slot": 2,
+      "plate": "DEF-5678",
+      "model": "Toyota Corolla 2021",
+      "owner": "Maria Santos",
+      "status": "aguardando_peca",
+      "service": "Revisão completa",
+      "type": "conserto",
+      "value": 1200.00,
+      "parts": [
+        { "name": "Filtro de óleo", "qty": 1, "stock": 5, "type": "troca" },
+        { "name": "Vela de ignição", "qty": 4, "stock": 0, "type": "troca" }
+      ],
+      "progress": 30,
+      "arrival": "2026-11-06T09:00:00.000Z",
+      "estimatedEnd": "2026-11-07T12:00:00.000Z",
+      "mechanic": "André"
+    },
+    {
+      "id": "OS003",
+      "slot": 3,
+      "plate": "GHI-9012",
+      "model": "VW Gol 2017",
+      "owner": "Pedro Costa",
+      "status": "concluido",
+      "service": "Troca de óleo",
+      "type": "troca",
+      "value": 220.00,
+      "parts": [
+        { "name": "Óleo motor 5W30", "qty": 4, "stock": 12, "type": "troca" },
+        { "name": "Filtro de óleo", "qty": 1, "stock": 5, "type": "troca" }
+      ],
+      "progress": 100,
+      "arrival": "2026-11-06T07:00:00.000Z",
+      "estimatedEnd": "2026-11-06T10:00:00.000Z",
+      "mechanic": "Carlos"
+    },
+    {
+      "id": "OS004",
+      "slot": 4,
+      "plate": "JKL-3456",
+      "model": "Fiat Uno 2015",
+      "owner": "Ana Lima",
+      "status": "diagnostico",
+      "service": "Ruído na suspensão",
+      "type": "conserto",
+      "value": 450.00,
+      "parts": [
+        { "name": "Amortecedor diant. E", "qty": 1, "stock": 2, "type": "troca" },
+        { "name": "Batente de amortecedor", "qty": 1, "stock": 4, "type": "troca" }
+      ],
+      "progress": 10,
+      "arrival": "2026-11-06T10:30:00.000Z",
+      "estimatedEnd": "2026-11-07T16:00:00.000Z",
+      "mechanic": "André"
+    },
+    {
+      "id": "OS005",
+      "slot": 5,
+      "plate": "MNO-7890",
+      "model": "Chevrolet Onix 2022",
+      "owner": "Lucas Ferreira",
+      "status": "em_andamento",
+      "service": "Alinhamento e balanceamento",
+      "type": "conserto",
+      "value": 180.00,
+      "parts": [
+        { "name": "Pesos de balanceamento", "qty": 8, "stock": 50, "type": "troca" }
+      ],
+      "progress": 80,
+      "arrival": "2026-11-06T11:00:00.000Z",
+      "estimatedEnd": "2026-11-06T13:00:00.000Z",
+      "mechanic": "Ricardo"
+    },
+    {
+      "id": "OS006",
+      "slot": 6,
+      "plate": "PQR-1122",
+      "model": "Ford Ka 2018",
+      "owner": "Fernanda Rocha",
+      "status": "em_andamento",
+      "service": "Sistema elétrico",
+      "type": "conserto",
+      "value": 750.00,
+      "parts": [
+        { "name": "Bateria 60Ah", "qty": 1, "stock": 2, "type": "troca" },
+        { "name": "Alternador recon.", "qty": 1, "stock": 0, "type": "conserto" }
+      ],
+      "progress": 45,
+      "arrival": "2026-11-06T09:30:00.000Z",
+      "estimatedEnd": "2026-11-06T17:00:00.000Z",
+      "mechanic": "Carlos"
+    }
+  ],
+  "emptySlots": [7, 8],
+  "stats": {
+    "totalOrders": 6,
+    "inProgress": 3,
+    "waitingParts": 1,
+    "completed": 1,
+    "diagnostic": 1,
+    "totalRevenue": 3380.00,
+    "mechanics": ["Carlos", "André", "Ricardo"]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "dashboard-3d",
+  "version": "1.0.0",
+  "description": "Dashboard 3D interativo com Three.js para acompanhamento de ordens de serviço",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.3",
+    "ws": "^8.22.1"
+  }
+}

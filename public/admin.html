@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Equipe — Oficina Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg: #0a0e1a;
+      --surface: #111828;
+      --border: rgba(100,150,255,0.15);
+      --text: #e0e6ff;
+      --muted: #667799;
+      --blue: #4a9eff;
+      --yellow: #ffc94a;
+      --green: #4aff9e;
+      --orange: #ff7c4a;
+      --red: #ff4a6a;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* Header */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 { font-size: 1rem; font-weight: 700; color: var(--blue); }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    #ws-status {
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .ws-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
+    .ws-dot.connected { background: var(--green); animation: blink 1.5s infinite; }
+    @keyframes blink { 50% { opacity: 0.4; } }
+
+    /* Login */
+    #login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 60px);
+      padding: 24px;
+    }
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 360px;
+    }
+    .login-card h2 { font-size: 1.1rem; margin-bottom: 6px; }
+    .login-card p { font-size: 0.82rem; color: var(--muted); margin-bottom: 24px; }
+
+    /* Forms */
+    label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px; }
+    input, select, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      margin-bottom: 14px;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue);
+      background: rgba(74,158,255,0.05);
+    }
+    select option { background: #111828; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-success { background: var(--green); color: #000; }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-secondary { background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid var(--border); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Main app */
+    #app-screen { display: none; padding: 16px; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: var(--surface);
+      padding: 4px;
+      border-radius: 10px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .card-plate { font-size: 1.05rem; font-weight: 700; letter-spacing: 1px; }
+    .card-model { font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+    .card-service { font-size: 0.85rem; color: var(--text); margin-bottom: 10px; }
+
+    .status-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .s-em_andamento { background: rgba(74,158,255,0.2); color: var(--blue); }
+    .s-aguardando_peca { background: rgba(255,201,74,0.2); color: var(--yellow); }
+    .s-concluido { background: rgba(74,255,158,0.2); color: var(--green); }
+    .s-diagnostico { background: rgba(255,124,74,0.2); color: var(--orange); }
+
+    /* Progress slider */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .progress-row input[type=range] {
+      flex: 1;
+      margin-bottom: 0;
+      padding: 0;
+      accent-color: var(--blue);
+      height: 24px;
+    }
+    .progress-val {
+      font-size: 0.75rem;
+      color: var(--blue);
+      font-weight: 700;
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* Parts */
+    .parts-section { margin-top: 8px; }
+    .part-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.78rem;
+    }
+    .part-name { flex: 1; color: #aabbdd; }
+    .part-controls { display: flex; align-items: center; gap: 6px; }
+    .part-controls button {
+      width: 26px; height: 26px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stock-num {
+      min-width: 24px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+    .stock-ok { color: var(--green); }
+    .stock-low { color: var(--yellow); }
+    .stock-zero { color: var(--red); }
+
+    .save-btn {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(74,158,255,0.1);
+      border: 1px solid rgba(74,158,255,0.3);
+      color: var(--blue);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+    .save-btn:active { background: rgba(74,158,255,0.2); }
+
+    /* New OS form */
+    .section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(74,255,158,0.15);
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; }
+    #toast.error { background: rgba(255,74,106,0.15); border-color: var(--red); color: var(--red); }
+
+    .error-msg { font-size: 0.8rem; color: var(--red); margin-top: -10px; margin-bottom: 10px; display: none; }
+
+    /* Stats summary */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-num { font-size: 1.5rem; font-weight: 800; }
+    .stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .stat-blue { color: var(--blue); }
+    .stat-yellow { color: var(--yellow); }
+    .stat-green { color: var(--green); }
+    .stat-rev { color: var(--green); }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🔧 Equipe — Oficina</h1>
+  <div class="header-right">
+    <div id="ws-status">
+      <div class="ws-dot" id="ws-dot"></div>
+      <span id="ws-label">Conectando...</span>
+    </div>
+  </div>
+</div>
+
+<!-- Login -->
+<div id="login-screen">
+  <div class="login-card">
+    <h2>Acesso da Equipe</h2>
+    <p>Digite a senha para acessar o painel de edição</p>
+    <label>Senha</label>
+    <input type="password" id="pwd-input" placeholder="••••••••" autocomplete="current-password">
+    <div class="error-msg" id="pwd-error">Senha incorreta. Tente novamente.</div>
+    <button class="btn btn-primary" id="login-btn">Entrar</button>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app-screen">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="ordens">Ordens</button>
+    <button class="tab-btn" data-tab="nova">Nova OS</button>
+    <button class="tab-btn" data-tab="resumo">Resumo</button>
+  </div>
+
+  <!-- Tab: Ordens -->
+  <div id="tab-ordens">
+    <div id="orders-container"></div>
+  </div>
+
+  <!-- Tab: Nova OS -->
+  <div id="tab-nova" style="display:none">
+    <div class="section-title">Nova ordem de serviço</div>
+    <label>Placa</label>
+    <input type="text" id="new-plate" placeholder="ABC-1234" style="text-transform:uppercase">
+    <label>Modelo do veículo</label>
+    <input type="text" id="new-model" placeholder="Honda Civic 2019">
+    <label>Nome do cliente</label>
+    <input type="text" id="new-owner" placeholder="João Silva">
+    <label>Serviço a realizar</label>
+    <input type="text" id="new-service" placeholder="Troca de freios">
+    <label>Vaga</label>
+    <select id="new-slot">
+      <option value="">Selecionar vaga...</option>
+    </select>
+    <label>Mecânico responsável</label>
+    <select id="new-mechanic">
+      <option value="Carlos">Carlos</option>
+      <option value="André">André</option>
+      <option value="Ricardo">Ricardo</option>
+    </select>
+    <label>Valor estimado (R$)</label>
+    <input type="number" id="new-value" placeholder="0.00" min="0" step="0.01">
+    <label>Status inicial</label>
+    <select id="new-status">
+      <option value="diagnostico">Diagnóstico</option>
+      <option value="em_andamento">Em andamento</option>
+      <option value="aguardando_peca">Aguardando peça</option>
+    </select>
+    <label>Tipo de serviço</label>
+    <select id="new-type">
+      <option value="conserto">Conserto</option>
+      <option value="troca">Troca de peças</option>
+    </select>
+    <button class="btn btn-success" id="add-order-btn" style="margin-top:4px">Adicionar Ordem</button>
+  </div>
+
+  <!-- Tab: Resumo -->
+  <div id="tab-resumo" style="display:none">
+    <div class="section-title">Resumo do dia</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num stat-blue" id="s-em">0</div><div class="stat-label">Em andamento</div></div>
+      <div class="stat-card"><div class="stat-num stat-yellow" id="s-ag">0</div><div class="stat-label">Aguardando peça</div></div>
+      <div class="stat-card"><div class="stat-num stat-green" id="s-ok">0</div><div class="stat-label">Concluídos</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-tot">0</div><div class="stat-label">Total OS</div></div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px">Faturamento do dia</div>
+      <div class="stat-num stat-rev" id="s-rev">R$ 0,00</div>
+    </div>
+    <div class="card">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px">Mecânicos em campo</div>
+      <div id="s-mechanics"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let password = '';
+let allData = null;
+let ws = null;
+let pendingEdits = {};
+
+// --- Auth ---
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const pwd = document.getElementById('pwd-input').value;
+  if (!pwd) return;
+  try {
+    const r = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd })
+    });
+    if (!r.ok) {
+      document.getElementById('pwd-error').style.display = 'block';
+      return;
+    }
+    password = pwd;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    document.getElementById('pwd-error').style.display = 'none';
+    connectWS();
+  } catch {
+    document.getElementById('pwd-error').style.display = 'block';
+  }
+});
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('login-btn').click();
+});
+
+// --- Tabs ---
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+    document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+    if (btn.dataset.tab === 'nova' && allData) populateSlots();
+  });
+});
+
+// --- WebSocket ---
+function connectWS() {
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${protocol}//${location.host}`);
+  ws.onopen = () => setWS(true);
+  ws.onclose = () => { setWS(false); setTimeout(connectWS, 3000); };
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'connected' || msg.type === 'update') {
+      allData = msg.data;
+      renderOrders();
+      updateStats();
+    }
+  };
+}
+
+function setWS(ok) {
+  document.getElementById('ws-dot').className = 'ws-dot' + (ok ? ' connected' : '');
+  document.getElementById('ws-label').textContent = ok ? 'Ao vivo' : 'Reconectando...';
+}
+
+// --- Render orders ---
+const STATUS_LABELS = {
+  em_andamento: 'Em andamento',
+  aguardando_peca: 'Aguardando peça',
+  concluido: 'Concluído',
+  diagnostico: 'Diagnóstico'
+};
+
+function renderOrders() {
+  if (!allData) return;
+  const container = document.getElementById('orders-container');
+  container.innerHTML = '';
+  allData.orders.forEach(order => {
+    const card = buildOrderCard(order);
+    container.appendChild(card);
+  });
+}
+
+function buildOrderCard(order) {
+  const wrap = document.createElement('div');
+  wrap.className = 'card';
+  wrap.dataset.id = order.id;
+
+  const prog = pendingEdits[order.id]?.progress ?? order.progress;
+  const status = pendingEdits[order.id]?.status ?? order.status;
+
+  wrap.innerHTML = `
+    <div class="card-header">
+      <div class="card-plate">${order.plate}</div>
+      <div class="status-badge s-${status}">${STATUS_LABELS[status] || status}</div>
+    </div>
+    <div class="card-model">${order.model} &bull; Vaga ${order.slot} &bull; ${order.mechanic}</div>
+    <div class="card-service">${order.service} &bull; <strong style="color:#4aff9e">R$ ${order.value.toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong></div>
+
+    <label style="margin-bottom:4px">Progresso</label>
+    <div class="progress-row">
+      <input type="range" min="0" max="100" value="${prog}" data-id="${order.id}" class="prog-slider">
+      <div class="progress-val prog-display">${prog}%</div>
+    </div>
+
+    <label>Status</label>
+    <select data-id="${order.id}" class="status-sel">
+      ${['em_andamento','aguardando_peca','diagnostico','concluido'].map(s =>
+        `<option value="${s}" ${s === status ? 'selected' : ''}>${STATUS_LABELS[s]}</option>`
+      ).join('')}
+    </select>
+
+    ${order.parts?.length ? `
+      <div class="parts-section">
+        <div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px">Peças</div>
+        ${order.parts.map((p, pi) => {
+          const stock = pendingEdits[order.id]?.parts?.[pi]?.stock ?? p.stock;
+          const sc = stock === 0 ? 'stock-zero' : stock <= 1 ? 'stock-low' : 'stock-ok';
+          return `
+            <div class="part-row">
+              <div class="part-name">${p.name} ×${p.qty}</div>
+              <div class="part-controls">
+                <button data-id="${order.id}" data-pi="${pi}" data-dir="-1" class="stock-btn">−</button>
+                <div class="stock-num ${sc}" id="stock-${order.id}-${pi}">${stock}</div>
+                <button data-id="${order.id}" data-pi="${pi}" data-dir="1" class="stock-btn">+</button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    ` : ''}
+
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="save-btn" data-id="${order.id}">💾 Salvar</button>
+      <button class="save-btn" data-id="${order.id}" data-remove="1" style="background:rgba(255,74,106,0.1);border-color:rgba(255,74,106,0.3);color:var(--red)">🗑 Remover</button>
+    </div>
+  `;
+
+  // Slider
+  wrap.querySelector('.prog-slider').addEventListener('input', e => {
+    e.target.closest('.card').querySelector('.prog-display').textContent = e.target.value + '%';
+    if (!pendingEdits[order.id]) pendingEdits[order.id] = {};
+    pendingEdits[order.id].progress = parseInt(e.target.value);
+  });
+
+  // Status select
+  wrap.querySelector('.status-sel').addEventListener('change', e => {
+    const val = e.target.value;
+    if (!pendingEdits[order.id]) pendingEdits[order.id] = {};
+    pendingEdits[order.id].status = val;
+    const badge = wrap.querySelector('.status-badge');
+    badge.className = `status-badge s-${val}`;
+    badge.textContent = STATUS_LABELS[val];
+  });
+
+  // Stock buttons
+  wrap.querySelectorAll('.stock-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const pi = parseInt(btn.dataset.pi);
+      const dir = parseInt(btn.dataset.dir);
+      if (!pendingEdits[id]) pendingEdits[id] = {};
+      if (!pendingEdits[id].parts) {
+        pendingEdits[id].parts = order.parts.map(p => ({ ...p }));
+      }
+      const cur = pendingEdits[id].parts[pi].stock;
+      pendingEdits[id].parts[pi].stock = Math.max(0, cur + dir);
+      const display = document.getElementById(`stock-${id}-${pi}`);
+      const s = pendingEdits[id].parts[pi].stock;
+      display.textContent = s;
+      display.className = 'stock-num ' + (s === 0 ? 'stock-zero' : s <= 1 ? 'stock-low' : 'stock-ok');
+    });
+  });
+
+  // Save
+  wrap.querySelectorAll('.save-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      if (btn.dataset.remove) {
+        if (!confirm('Remover esta OS?')) return;
+        await removeOrder(id);
+        return;
+      }
+      await saveOrder(id, order);
+    });
+  });
+
+  return wrap;
+}
+
+async function saveOrder(id, originalOrder) {
+  const edits = pendingEdits[id] || {};
+  const payload = { ...originalOrder, ...edits };
+  try {
+    const r = await fetch(`/api/orders/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', password },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error();
+    delete pendingEdits[id];
+    showToast('✅ OS ' + id + ' salva');
+  } catch {
+    showToast('❌ Erro ao salvar', true);
+  }
+}
+
+async function removeOrder(id) {
+  try {
+    const r = await fetch(`/api/orders/${id}`, {
+      method: 'DELETE',
+      headers: { password }
+    });
+    if (!r.ok) throw new Error();
+    delete pendingEdits[id];
+    showToast('🗑 OS removida');
+  } catch {
+    showToast('❌ Erro ao remover', true);
+  }
+}
+
+// --- New order ---
+document.getElementById('add-order-btn').addEventListener('click', async () => {
+  const plate = document.getElementById('new-plate').value.trim().toUpperCase();
+  const model = document.getElementById('new-model').value.trim();
+  const owner = document.getElementById('new-owner').value.trim();
+  const service = document.getElementById('new-service').value.trim();
+  const slot = parseInt(document.getElementById('new-slot').value);
+  const mechanic = document.getElementById('new-mechanic').value;
+  const value = parseFloat(document.getElementById('new-value').value) || 0;
+  const status = document.getElementById('new-status').value;
+  const type = document.getElementById('new-type').value;
+
+  if (!plate || !model || !service || !slot) {
+    showToast('❌ Preencha placa, modelo, serviço e vaga', true);
+    return;
+  }
+
+  const payload = { plate, model, owner, service, slot, mechanic, value, status, type, progress: 0, parts: [] };
+  try {
+    const r = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', password },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error();
+    ['new-plate','new-model','new-owner','new-service','new-value'].forEach(id => { document.getElementById(id).value = ''; });
+    showToast('✅ OS adicionada!');
+    document.querySelector('[data-tab="ordens"]').click();
+  } catch {
+    showToast('❌ Erro ao adicionar OS', true);
+  }
+});
+
+function populateSlots() {
+  const sel = document.getElementById('new-slot');
+  sel.innerHTML = '<option value="">Selecionar vaga...</option>';
+  if (!allData) return;
+  allData.emptySlots.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = `Vaga ${s}`;
+    sel.appendChild(opt);
+  });
+}
+
+// --- Stats ---
+function updateStats() {
+  if (!allData?.stats) return;
+  const s = allData.stats;
+  document.getElementById('s-em').textContent = s.inProgress || 0;
+  document.getElementById('s-ag').textContent = s.waitingParts || 0;
+  document.getElementById('s-ok').textContent = s.completed || 0;
+  document.getElementById('s-tot').textContent = s.totalOrders || 0;
+  document.getElementById('s-rev').textContent = 'R$ ' + (s.totalRevenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  const mechDiv = document.getElementById('s-mechanics');
+  if (s.mechanics) {
+    mechDiv.innerHTML = s.mechanics.map(m => `
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid rgba(255,255,255,0.05)">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(74,158,255,0.2);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--blue)">${m[0]}</div>
+        <div style="font-size:0.85rem">${m}</div>
+      </div>
+    `).join('');
+  }
+}
+
+// --- Toast ---
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isError ? ' error' : '');
+  setTimeout(() => { t.className = ''; }, 2500);
+}
+</script>
+</body>
+</html>
